@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Print Calculator</title>
+        <style>
+            .flex {
+                display: flex;
+                justify-content: space-between;
+            }
+            .flex > div {
+                display: flex;
+                align-content: center;
+                align-items: center;
+            }
+            .flex > div:nth-child(1) {
+                justify-content: space-between;
+                width: 100%;
+            }
+            label {
+                width:max-content !important;
+                white-space: nowrap;
+            }
+            input {
+                margin: 5px 10px;
+                width: 100%;
+            }
+            .centerElem {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 900px;
+                height: 320px;
+                padding: 20px;
+                border: #cccccc solid 1px;
+                border-radius: 10px;
+                box-shadow: #bcbcbc 0px 0px 20px 0px;
+            }
+            .total {
+                width: 100px;
+                float:right
+            }
+        </style>
+    </head>
+    <body>
+        <div class="centerElem">
+            <div>
+                <h2>Development Cost</h2>
+                <div class="flex">
+                    <div>
+                        <label for="workHrs">Working Hours: </label>
+                        <input name="workHrs" id="workHrs" type="number" value="0">
+                        <label for="workMins">Minutes: </label>
+                        <input name="workMins" id="workMins" type="number" value="0">
+                    </div>
+                    <div>
+                        <label for="workTotal">Development Cost: </label>
+                        <input name="workTotal" id="workTotal" type="number" readonly>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h2>Material Cost</h2>
+                <div class="flex">
+                    <div>
+                        <label for="materialG">Material (g): </label>
+                        <input name="materialG" id="materialG" type="number" value="0">
+                        <label for="materialM">Material (m): </label>
+                        <input name="materialM" id="materialM" type="number" value="0">
+                        <label for="materialCost">Material Per G: </label>
+                        <input name="materialCost" id="materialCost" type="number" value="0.6">
+                    </div>
+                    <div>
+                        <label for="materialTotal">Material Cost: </label>
+                        <input name="materialTotal" id="materialTotal" type="number" readonly>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h2>Production Cost</h2>
+                <div class="flex">
+                    <div>
+                        <label for="productionHrs">Print Hours: </label>
+                        <input name="productionHrs" id="productionHrs" type="number" value="0">
+                        <label for="productionMins">Minutes: </label>
+                        <input name="productionMins" id="productionMins" type="number" value="0">
+                    </div>
+                    <div>
+                        <label for="productionTotal">Production Cost: </label>
+                        <input name="productionTotal" id="productionTotal" type="number" readonly>
+                    </div>
+                </div>
+            </div>
+            <input placeholder="Total" type="number" readonly class="total">
+        </div>
+        <script>
+            const workHours = document.querySelector("input#workHrs")
+            const workMinutes = document.querySelector("input#workMins")
+            const workTotal = document.querySelector("input#workTotal")
+            const materialG = document.querySelector("input#materialG")
+            const materialM = document.querySelector("input#materialM")
+            const materialCost = document.querySelector("input#materialCost")
+            const materialTotal = document.querySelector("input#materialTotal")
+            const productionHours = document.querySelector("input#productionHrs")
+            const productionMinutes = document.querySelector("input#productionMins")
+            const productionTotal = document.querySelector("input#productionTotal")
+            const total = document.querySelector("input.total")
+            workHours.addEventListener("change", workUpdate)
+            workMinutes.addEventListener("change", workUpdate)
+            materialG.addEventListener("change", materialConversionGrams)
+            materialM.addEventListener("change", materialConversionMeters)
+            materialCost.addEventListener("change", materialUpdate)
+            productionHours.addEventListener("change", productionUpdate)
+            productionMinutes.addEventListener("change", productionUpdate)
+            function productionUpdate() {
+                try {
+                    var minutes, hours = 0
+                    try {
+                        minutes = parseFloat(productionMinutes.value)
+                    } catch (error) {}
+                    try {
+                        hours = parseFloat(productionHours.value)
+                    } catch (error) {}
+                    productionTotal.value = ((hours+minutes/60)*0.8).toFixed(5)
+                    calculateTotal()
+                } catch (error) {
+                    console.log("Error occurred :(")
+                    productionTotal.value = ""
+                }
+            }
+            function materialConversionMeters() {
+                try {
+                    materialG.value = parseFloat(materialM.value)*2.982
+                    materialUpdate()
+                } catch (error) {
+                    console.log("Error occurred :(")
+                }
+            }
+            function materialConversionGrams() {
+                try {
+                    materialM.value = parseFloat(materialG.value)/2.982
+                    materialUpdate()
+                } catch (error) {
+                    console.log("Error occurred :(")
+                }
+            }
+            function materialUpdate() {
+                try {
+                    var g, mC = 0
+                    try {
+                        g = parseFloat(materialG.value)
+                    } catch (error) {}
+                    try {
+                        mC = parseFloat(materialCost.value)
+                    } catch (error) {}
+                    materialTotal.value = (g*mC).toFixed(5)
+                    calculateTotal()
+                } catch (error) {
+                    console.log("Error occurred :(")
+                    materialTotal.value = ""
+                }
+            }
+            function workUpdate() {
+                try {
+                    var minutes, hours = 0
+                    try {
+                        minutes = parseFloat(workMinutes.value)
+                    } catch (error) {}
+                    try {
+                        hours = parseFloat(workHours.value)
+                    } catch (error) {}
+                    workTotal.value = ((hours+minutes/60)*30).toFixed(5)
+                    calculateTotal()
+                } catch (error) {
+                    console.log("Error occurred :(")
+                    workTotal.value = ""
+                }
+            }
+            function calculateTotal() {
+                try {
+                    total.value = parseFloat(workTotal.value)+parseFloat(materialTotal.value)+parseFloat(productionTotal.value)
+                } catch (error) {
+                    console.log("Error occurred :(")
+                    workTotal.value = ""
+                }
+            }
+            productionUpdate()
+            materialUpdate()
+            workUpdate()
+        </script>
+    </body>
+</html>
